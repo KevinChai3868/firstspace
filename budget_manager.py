@@ -1,10 +1,12 @@
 """Interactive budget manager.
 
 Allows entering plan metadata, budget categories and spending updates,
-then produces execution reports.
+then produces execution reports. Supports a non-interactive demo mode
+to show sample usage/output.
 """
 from __future__ import annotations
 
+import argparse
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -147,5 +149,31 @@ def interactive_session() -> None:
             print(f"操作失敗：{exc}")
 
 
+def demo_run() -> None:
+    print("=== 示範模式：經費管理 ===")
+    manager = BudgetManager("AI 研究計畫", "2024-01-01", "2024-12-31")
+    manager.add_category("人事費", 1_200_000)
+    manager.add_category("設備費", 500_000)
+    manager.add_category("旅運費", 150_000)
+
+    manager.record_spending("人事費", 300_000, "1-3 月薪資")
+    manager.record_spending("設備費", 120_000, "伺服器升級")
+    manager.record_spending("旅運費", 45_000, "出差車票與住宿")
+
+    print("已建立示範資料，以下為報表：\n")
+    print(manager.summary())
+
+
 if __name__ == "__main__":
-    interactive_session()
+    parser = argparse.ArgumentParser(description="簡易經費管理工具")
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="以示範資料直接輸出執行畫面（不需互動）",
+    )
+    args = parser.parse_args()
+
+    if args.demo:
+        demo_run()
+    else:
+        interactive_session()
